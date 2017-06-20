@@ -1,0 +1,75 @@
+Security VIP
+============
+
+VIP is quite an important concept in i.MX8 series projects' DV TB, precisely speaking, in i.MXQM and i.MXQXP . We intend to improve re-usability through different projects by encapsulate some relevant testbench resources according to either **IP** or **Subsystem** . 
+
+We are going to talk about our security subsystem VIP here , of course, in a most precise way as we can. You can also take this article as an typical entry to snoop at general structure of VIPs in our project if you are not that familiar with them.
+
+Directory Structure 
+-------------------
+Below is the directory of our VIP. Please notice that it may differ with some other VIP in details, like we don't have **forces_v** under **testbench**. And of course, VIP owner can add if needed.
+
+.. literalinclude:: dir_tree.rst
+
+Resources
+---------
+
+We will look into detailed useful resources provided by the VIP in this article .
+
+
+Fuse Load
+~~~~~~~~~
+Backdoor initializing fuse need predefined fuse values matched with fuse map of our project. The fuse values can be specified through args . Let's take a look at this.
+
+Related Files:
+
+* C work
+
+  + $(DESIGN_DIR)/testbench/blocks/soc_tb/tool_data/gnu/cm4/SCU _cm4.lnk
+
+  + $(DESIGN_DIR)/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/fuse_map.h
+
+* V work
+
+  + $(DESIGN_DIR)/testbench/imx_subsys_vip/v_sc_imx_security_vip/testbench/modules_v/ocotp_preloader.sv
+
+  + $(DESIGN_DIR)/testbench/blocks/soc_tb/testbench/top_instances_v/memory_interface_inst.sv
+
+Ok, here is the thing, in **fuse_map.h** , we declared an static array of which the size is matched to our design.
+
+::
+   
+   static const uint32_t fuse_map_array[800] __attribute__ ((section(".efuse"))) __attribute__ ((used)) = { ...};
+
+This array is initialized with values defined with macros, which can be specified in your pattern's arg file as below::
+   
+   SCU_C_ARG += OTP_MFG_KEY
+   SCU_C_ARG += OTP_MFG_KEY_0=0x64234237 
+   SCU_C_ARG += OTP_MFG_KEY_1=0x43432321 
+   SCU_C_ARG += OTP_MFG_KEY_2=0x57567565
+   SCU_C_ARG += OTP_MFG_KEY_3=0xEADA1231
+   SCU_C_ARG += OTP_MFG_KEY_4=0xCADE3453
+   SCU_C_ARG += OTP_MFG_KEY_5=0xBAAB8898
+   SCU_C_ARG += OTP_MFG_KEY_6=0x56562321
+   SCU_C_ARG += OTP_MFG_KEY_7=0x7880EADA
+
+Well, as we can see , we are using **SCU_C_ARG** to add macros, in fact, we must use this due to the compiler flow in our top TB. 
+Only during **SCU**'s compiling, this file will be picked and compiled , as you may notice that in our declaration of **fuse_map_array**, it's bonded with section **.efuse** . Then in our link script **SCU_cm4.lnk**, it is allocated to specific memory address::
+
+  //memory declare
+  efuse_mem           : org = EFUSE_BASE              , len = EFUSE_SIZE
+  ...
+  ...
+  ...
+  //allocate section .efuse to memory block efuse_mem declared before
+  .efuse               : { KEEP(*(.efuse*));                                       } > efuse_mem    
+   
+Then after compiling, you will be able to see our predefined fuse values in fixed location of our generated **HEX** file.    
+
+On the other side, we declare and instantiate **ocotp_preloader** in **ocotp_preloader.sv** and **memory_interface_inst.sv**.
+
+At the beginning of our simulation, we will call the build-in task **load_mem** to load the fuse values to our fuse array model through **BACKDOOR**, just like how we do with other normal ROMs and RAMs.  
+
+Monitors
+~~~~~~~~
+There are several monitors 

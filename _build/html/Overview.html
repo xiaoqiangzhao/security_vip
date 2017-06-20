@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &#8212; I.MX Security Subsystem QuickReference 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>VIP is quite an important concept in i.MX8 series projects&#8217; DV TB, precisely speaking, in i.MXQM and i.MXQXP . We intend to improve re-usability through different projects by encapsulate some relevant testbench resources according to either <strong>IP</strong> or <strong>Subsystem</strong> .</p>
+<p>We are going to talk about our security subsystem VIP here , of course, in a most precise way as we can. You can also take this article as an typical entry to snoop at general structure of VIPs in our project if you are not that familiar with them.</p>
+<div class="section" id="directory-structure">
+<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
+<p>Below is the directory of our VIP. Please notice that it may differ with some other VIP in details, like we don&#8217;t have <strong>forces_v</strong> under <strong>testbench</strong>. And of course, VIP owner can add if needed.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>
+Base Dir: $(DESIGN_DIR)/testbench/imx_subsys_vip/v_sc_imx_security_vip
+
+v_sc_imx_security_vip.
+|-- arg             /*the arg files will be picked up by Top TB for analysis*/
+|-- doc             /*Any documents should be put here*/
+|-- global          /*block config and testbench config files should be put here*/
+|-- testbench       
+|   |-- classes_v   /*UVM class files, usually we have some uvm_sequence alike things here*/
+|   |-- defines_v   /*all definitions should be put here*/
+|   |-- instances_v /*some instances of drivers, monitors are here, some are on top level TB */
+|   `-- modules_v   /*Put modules of drivers, monitors here*/
+|-- tool_data
+|   |-- compiler
+|   |   `-- include /*Header files including APIs for different IPs*/
+|   |-- scripts     /*For scripts*/
+|   `-- sray
+|       `-- mem_map /*verilog style header files of memory map, top TB will generate both C style and V style header files from these */
+`-- vectors         /*different vectors&#39; directory, all patterns&#39; C files are put in stimulus directory*/
+    |-- life_cycle
+    |   `-- stimulus
+    |-- Other Vectors
+    |   
+        
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="i.MX_Security_Subsystem_QuickReference.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="i.MX_Security_Subsystem_QuickReference.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Overview.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jay Zhao.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Overview.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

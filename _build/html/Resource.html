@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Resources &#8212; I.MX Security Subsystem QuickReference 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="placeholder" href="Regression.html" />
+    <link rel="prev" title="Overview" href="Overview.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="resources">
+<h1>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h1>
+<p>We will look into detailed useful resources provided by the VIP in this article .</p>
+<div class="section" id="fuse-load">
+<h2>Fuse Load<a class="headerlink" href="#fuse-load" title="Permalink to this headline">¶</a></h2>
+<p>Backdoor initializing fuse need predefined fuse values matched with fuse map of our project. The fuse values can be specified through args . Let&#8217;s take a look at this.</p>
+<p>Related Files:</p>
+<ul class="simple">
+<li>C work<ul>
+<li>$(DESIGN_DIR)/testbench/blocks/soc_tb/tool_data/gnu/cm4/SCU _cm4.lnk</li>
+<li>$(DESIGN_DIR)/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/fuse_map.h</li>
+</ul>
+</li>
+<li>V work<ul>
+<li>$(DESIGN_DIR)/testbench/imx_subsys_vip/v_sc_imx_security_vip/testbench/modules_v/ocotp_preloader.sv</li>
+<li>$(DESIGN_DIR)/testbench/blocks/soc_tb/testbench/top_instances_v/memory_interface_inst.sv</li>
+</ul>
+</li>
+</ul>
+<p>Ok, here is the thing, in <strong>fuse_map.h</strong> , we declared an static array of which the size is matched to our design.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">const</span> <span class="n">uint32_t</span> <span class="n">fuse_map_array</span><span class="p">[</span><span class="mi">800</span><span class="p">]</span> <span class="n">__attribute__</span> <span class="p">((</span><span class="n">section</span><span class="p">(</span><span class="s2">&quot;.efuse&quot;</span><span class="p">)))</span> <span class="n">__attribute__</span> <span class="p">((</span><span class="n">used</span><span class="p">))</span> <span class="o">=</span> <span class="p">{</span> <span class="o">...</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>This array is initialized with values defined with macros, which can be specified in your pattern&#8217;s arg file as below:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_0</span><span class="o">=</span><span class="mh">0x64234237</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_1</span><span class="o">=</span><span class="mh">0x43432321</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_2</span><span class="o">=</span><span class="mh">0x57567565</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_3</span><span class="o">=</span><span class="mh">0xEADA1231</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_4</span><span class="o">=</span><span class="mh">0xCADE3453</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_5</span><span class="o">=</span><span class="mh">0xBAAB8898</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_6</span><span class="o">=</span><span class="mh">0x56562321</span>
+<span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">OTP_MFG_KEY_7</span><span class="o">=</span><span class="mh">0x7880EADA</span>
+</pre></div>
+</div>
+<p>Well, as we can see , we are using <strong>SCU_C_ARG</strong> to add macros, in fact, we must use this due to the compiler flow in our top TB.
+Only during <strong>SCU</strong>&#8216;s compiling, this file will be picked and compiled , as you may notice that in our declaration of <strong>fuse_map_array</strong>, it&#8217;s bonded with section <strong>.efuse</strong> . Then in our link script <strong>SCU_cm4.lnk</strong>, it is allocated to specific memory address:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">memory</span> <span class="n">declare</span>
+<span class="n">efuse_mem</span>           <span class="p">:</span> <span class="n">org</span> <span class="o">=</span> <span class="n">EFUSE_BASE</span>              <span class="p">,</span> <span class="nb">len</span> <span class="o">=</span> <span class="n">EFUSE_SIZE</span>
+<span class="o">...</span>
+<span class="o">...</span>
+<span class="o">...</span>
+<span class="o">//</span><span class="n">allocate</span> <span class="n">section</span> <span class="o">.</span><span class="n">efuse</span> <span class="n">to</span> <span class="n">memory</span> <span class="n">block</span> <span class="n">efuse_mem</span> <span class="n">declared</span> <span class="n">before</span>
+<span class="o">.</span><span class="n">efuse</span>               <span class="p">:</span> <span class="p">{</span> <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">efuse</span><span class="o">*</span><span class="p">));</span>                                       <span class="p">}</span> <span class="o">&gt;</span> <span class="n">efuse_mem</span>
+</pre></div>
+</div>
+<p>Then after compiling, you will be able to see our predefined fuse values in fixed location of our generated <strong>HEX</strong> file.</p>
+<p>On the other side, we declare and instantiate <strong>ocotp_preloader</strong> in <strong>ocotp_preloader.sv</strong> and <strong>memory_interface_inst.sv</strong>.</p>
+<p>At the beginning of our simulation, we will call the build-in task <strong>load_mem</strong> to load the fuse values to our fuse array model through <strong>BACKDOOR</strong>, just like how we do with other normal ROMs and RAMs.</p>
+</div>
+<div class="section" id="monitors">
+<h2>Monitors<a class="headerlink" href="#monitors" title="Permalink to this headline">¶</a></h2>
+<p>There are several monitors for some key IPs inside the security subsystem.
+Please notice,some monitors declared are not instantiated for design changes or just useless anymore.
+Most prototype modules are declared under security VIP, and a few are under some common VIPs</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/testbench/modules_v
+or
+$DESIGN_DIR/testbench/common_blocks/**IP_VIP**/testbench/modules_v
+</pre></div>
+</div>
+<p>But their instances may be in security VIP:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/testbench/instances_v
+</pre></div>
+</div>
+<p>or TOP level</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/testbench/top_instances_v
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="13%" />
+<col width="55%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Monitors</td>
+<td>Instance DIR</td>
+<td>Modules DIR</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td>adm_monitor</td>
+<td>TOP</td>
+<td>SEC VIP</td>
+<td>Checker <a class="footnote-reference" href="#checker" id="id1">[1]</a> and Reporter for inner logic of ADM.
+e.g.,Life cycle transition, Jtagc control, etc..</td>
+</tr>
+<tr class="row-odd"><td>caam_monitor</td>
+<td>SEC VIP</td>
+<td>SEC VIP</td>
+<td>Checker for Keys inside CAAM, Please notice,
+CAAM is a complex IP, detailed logic are supposed
+be covered in standalone ENV</td>
+</tr>
+<tr class="row-even"><td>caam_rand_cg_mon</td>
+<td>TOP</td>
+<td>SEC VIP</td>
+<td>Checker the ADM CAAM random clockgen enable</td>
+</tr>
+<tr class="row-odd"><td>sec_wdg_mon</td>
+<td>SEC VIP</td>
+<td>SEC VIP</td>
+<td>Checker and Reporter for wdog under security subsystem</td>
+</tr>
+<tr class="row-even"><td>snvs_trim_mon</td>
+<td>SEC VIP</td>
+<td><strong>SNVS VIP</strong></td>
+<td>Checker for Voltage, Clock, Temperature Tampers Trim</td>
+</tr>
+<tr class="row-odd"><td>snvs_trim_qmax_mon</td>
+<td>SEC VIP</td>
+<td>SEC VIP</td>
+<td>Additional Checker for SNVS&amp;ANALOG trim, like OSC, VBG,etc..</td>
+</tr>
+</tbody>
+</table>
+<p>Basically, monitors are used in security vip behave like a golden model to check and report some expected behavior under certain condition.
+They can be  <strong>Always-Check</strong> <a class="footnote-reference" href="#a-c" id="id2">[2]</a> or <strong>Auto-Trigger</strong> <a class="footnote-reference" href="#a-t" id="id3">[3]</a> statements.
+Another common scenario is using CAPI methods to communicate and trigger Checker.</p>
+<p>A simple flow may be:</p>
+<ol class="arabic simple">
+<li><strong>Front-door setup, either by SW or driver through Pads.</strong></li>
+<li><strong>Trigger mailbox or trigger from C side.</strong></li>
+<li><strong>Receive mailbox or trigger in monitor and execute checker.</strong></li>
+</ol>
+</div>
+<div class="section" id="drivers">
+<h2>Drivers<a class="headerlink" href="#drivers" title="Permalink to this headline">¶</a></h2>
+<p>There are two kinds of drivers in security vip.</p>
+<ol class="arabic simple">
+<li>Module-Instance based driver. Usually for pads like <strong>ONOFF</strong>, <strong>TAMPER</strong> .</li>
+<li>Procedure-Block based driver. This is kind of <strong>BackDoor</strong> method to operate internal signals. Not recommended but sometimes useful.</li>
+</ol>
+<p>See summary below.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="52%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Drivers</td>
+<td>Module DIR</td>
+<td>Instance DIR</td>
+<td>Type</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td>snvs_onoff_drv_qmax</td>
+<td>SEC VIP</td>
+<td>SEC VIP</td>
+<td>Module-Instance</td>
+<td>Drive <strong>OnOFF</strong> pad, mostly based on mailbox and trigger
+Please notice, there is an internal initial-block used to
+accelerate 32k clk.
+Add <strong>SNVS_LP_SPEED_32kHZ_CLK</strong> to <strong>sim_arg</strong> to enable this</td>
+</tr>
+<tr class="row-odd"><td>snvs_tamper_drv_qmax</td>
+<td>SEC VIP</td>
+<td>SEC VIP</td>
+<td>Module-Instance</td>
+<td>Drive <strong>SNVS TAMPER</strong> pads. We have 10 external tamper and five
+of which can be used as active tamper. It differs with QM where
+only 4 external tamper and 2 active tamper exist.</td>
+</tr>
+<tr class="row-even"><td>adm_gpr_test_drivers</td>
+<td>NULL</td>
+<td>SEC VIP</td>
+<td>Procedure-Block</td>
+<td>Drive inner logic of ADM . This driver is the most important one in
+security VIP since several Vectors and many test cases are involved
+and lots of force assignments are used inside . Need special care</td>
+</tr>
+<tr class="row-odd"><td>ram_ecc_corrupt</td>
+<td>NULL</td>
+<td>SEC VIP</td>
+<td>Procedure-Block</td>
+<td>Specific driver to generate signal-bit and multi-bits ECC error
+in SECO RAM.</td>
+</tr>
+<tr class="row-even"><td>sec_wdg_drv</td>
+<td>NULL</td>
+<td>SEC VIP</td>
+<td>Procedure-Block</td>
+<td>Specific driver to some internal wdog signals.E.g. ipg_clk, wdg_rsto
+cm0p_sleeping,etc..  Not Recommended in my personal opinion</td>
+</tr>
+<tr class="row-odd"><td>snvs_msic</td>
+<td>SNVS VIP</td>
+<td>SEC VIP</td>
+<td>Module-Instance</td>
+<td>SNVS msic control</td>
+</tr>
+</tbody>
+</table>
+<p>For any <strong>force assignment</strong> insides the drivers, we need to make sure it won&#8217;t affect other vectors. Usually we have <strong>MailBox</strong>, <strong>Trigger</strong>,  <strong>Macro</strong>, or <strong>sim_arg</strong> to block <a class="footnote-reference" href="#block" id="id4">[4]</a> those assignments . As with those that are not blocked, rigorous review is needed to avoid side-effect.</p>
+</div>
+<div class="section" id="c-env">
+<h2>C ENV<a class="headerlink" href="#c-env" title="Permalink to this headline">¶</a></h2>
+<p>Besides of verilog&amp;systemverilog component, another big part of resource provided by our VIP is about C .
+As we know, out TB consists of <strong>C</strong> and <strong>Verilog</strong>, it&#8217;s quite a typical style for verification TB if any components akin to CPU exist in the chip. Here  <strong>C</strong> refers to the complete compile toolsuits and related resource like included files,lib,etc. to build the final <strong>HEX</strong> file for specific RAM, ROM, or Fuses as mentioned before. Well, apparently, Fuses are not part of memory of code for our core. That&#8217;s just a trick for convinience . See section Fuse Load for details.
+The so called C ENV provided by our VIP can be divided into two parts.</p>
+<ol class="arabic simple">
+<li>Contexts and APIs</li>
+<li>Memory definition</li>
+</ol>
+<div class="section" id="contexts-and-apis">
+<h3>Contexts and APIs<a class="headerlink" href="#contexts-and-apis" title="Permalink to this headline">¶</a></h3>
+<p>Context is a key concept in our C side of TB. Basically for every IP inside the subsystem, there would be a relative struct, where some basic items are declared, like REGS_BASE, TRIG_BASE, MBOX_BASE, etc..</p>
+<p>In our security VIP , contexts are declared or created under</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include
+</pre></div>
+</div>
+<p>Please notice, not all context prototype are declared under our <strong>SEC VIP</strong>, since for many of them are already done under <strong>IP VIP</strong>, what we need to do is define the API to create such an instance and add it to the top TB. Let&#8217;s take <strong>ROMCP</strong>  as an example to briefly illustrate this.</p>
+<p>In our chip, we have three ROMCP:</p>
+<ul class="simple">
+<li>ROMCP under <strong>LSIO</strong> subsystem, it&#8217;s for other masters like <strong>CA35</strong></li>
+<li>ROMCP under <strong>SCU</strong> subsystem, it&#8217;s for <strong>SCU_CM4</strong></li>
+<li>ROMCP under <strong>Security</strong> subsystem, it&#8217;s for our <strong>SECO</strong> and this is the one we need to care.</li>
+</ul>
+<p>The context for ROMCP is declared under ROMCP VIP:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/common_blocks/v_ms_imx_romcp_vip/tool_data/compiler/include/romcp.h
+
+typedef struct
+{ char*          NAME;
+  address_t      REGS_BASE;
+  uint16_t       TRIG_BASE;
+  uint16_t       MBOX_BASE;
+  vector_t       ROMCP_IPS_ERROR_VECTOR;
+  uint32_t       IPS_SLOT_SIZE;
+  uint8_t        ips_err_int_cnt;
+  uint32_t*      ROMCP_REG_ADDR_OFFSET_LST;
+  uint32_t*      ROMCP_REG_RST_LST;
+  uint32_t*      ROMCP_REG_BIT_MASK_LST;
+  uint32_t*      ROMCP_REG_RW_BIT_MASK_LST;
+} ROMCP_CONTEXT;
+</pre></div>
+</div>
+<p>Then, we just create the creation API under our SEC VIP</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/ss_sec_romcp_context.h
+
+void ss_sec_create_context_romcp0(ROMCP_CONTEXT** context){
+   static ROMCP_CONTEXT static_context;
+   static_context.NAME                    = &quot;SEC_ROMCP&quot;;
+   #ifndef SECO_ACCESS
+   static_context.REGS_BASE               =  SEC_ROMCP_BASE; //NEED TO CHANGE THE NAME TO ROMCP(IT IS FLEXBUS NOW in sec_base_address file)
+   #else
+   static_context.REGS_BASE               =  SECO_ROMCP_BASE;
+   #endif
+   static_context.ips_err_int_cnt           = 0;
+   static_context.ROMCP_REG_ADDR_OFFSET_LST = (uint32_t*)&amp;sec_romcp_reg_addr_offset_lst[0];
+   static_context.ROMCP_REG_RST_LST         = (uint32_t*)&amp;sec_romcp_reg_rst_lst[0];
+   static_context.ROMCP_REG_BIT_MASK_LST    = (uint32_t*)&amp;sec_romcp_reg_bit_mask_lst[0];
+   static_context.ROMCP_REG_RW_BIT_MASK_LST = (uint32_t*)&amp;sec_romcp_reg_rw_bit_mask_lst[0];
+   //static_context.TRIG_BASE             = SCU_ROMCP_TRIG_BASE; //FUTURE USAGE
+   //static_context.MBOX_BASE             = SCU_ROMCP_MBOX_BASE; //FUTURE USAGE
+   static_context.ROMCP_IPS_ERROR_VECTOR  = HARD_FAULT_XCP;
+   *context=&amp;static_context;
+ }
+</pre></div>
+</div>
+<p>Last step, we modify the top_level file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/tool_data/compiler/include/context_romcp.h
+
+void romcp_populate_request(ip_request_t* ip_request){
+   #ifdef ROMCP_ID
+     ip_request-&gt;context_id            = ROMCP_ID;
+   #endif
+     ip_request-&gt;context_array_length  = NUM_ROMCP_IN_SYSTEM;
+     ip_request-&gt;init_context          = romcp_init_context;
+   }
+
+void romcp_init_context(ip_request_t* ip_request){
+  switch (ip_request-&gt;context_id){
+    case (LSIO_ROMCP_0):   INFO(&quot;romcp_init_context&quot;,&quot;Initialize LSIO ROMCP context&quot;);
+                        ss_lsio_create_context_romcp0((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
+                        //b48029 - Define added temporarily to avoid errors when the Security controller
+                        //Core M0 parse these lines , seco_ip_request needs to add this filed to ip_request strunct
+                        #ifndef SECO_ACCESS
+                        ip_request-&gt;clock_config   = DSC_ENABLE_LSIO_DSC;
+                        #endif
+            INFO(&quot;STIM&quot;, &quot;Initialize LSIO DSC&quot;);
+                        INFO(&quot;STIM&quot;, &quot;Initialize LSIO ROMCP clock&quot;);
+
+                        break;
+    case (SCU_ROMCP):   INFO(&quot;romcp_init_context&quot;,&quot;Initialize SCU ROMCP context&quot;);
+                        ss_scu_romcp_context((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
+                        #ifndef SECO_ACCESS
+                        DSC_INIT_SCU_SYS();
+                        #endif
+                        break;
+
+     case(SEC_ROMCP_0): INFO(&quot;romcp_init_context&quot;,&quot;Initialize LSIO ROMCP context&quot;);
+                        ss_sec_create_context_romcp0((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
+                        //ip_request-&gt;clock_config   = DSC_ENABLE_LSIO_DSC;slice ?
+            INFO(&quot;STIM&quot;, &quot;Initialize SEC DSC&quot;);
+                        INFO(&quot;STIM&quot;, &quot;Initialize SEC ROMCP clock&quot;);
+
+                        break;
+    default:            ERROR(&quot;populate_romcp&quot;,&quot;trying to populated an unsupported ROMCP&quot;);
+                        break;
+  }
+}
+</pre></div>
+</div>
+<p>Finally, all set done. Just to reminder, if you are building a new context, remember to add necessary information in <strong>context_api.h</strong> and <strong>ip_request.h</strong>, just like how we do with <strong>MMCAU</strong> <a class="footnote-reference" href="#mmcau" id="id5">[5]</a> for SECO, which is added in i.MXQXP .</p>
+<p>To specify which ROMCP is involved in your test case , just assign correct ID to the IP in your arg file like below</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">ROMCP_ID</span><span class="o">=</span><span class="n">SEC_ROMCP_0</span>
+</pre></div>
+</div>
+<p>Based on the context, some APIs are created for some specific tasks, and it would be very convenient for reuse if the same type IP are integrated with more than one instances .
+For any function used in the test cases, you&#8217;d better look into our SEC VIP or IP VIP for detailed information. Personally ,I recommend using <a class="reference external" href="http://cscope.sourceforge.net/">CSCOPE</a> to aid you for quick lookup.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="checker" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Checker here refers to the statements declared using <strong>assert</strong>, <strong>cover</strong> , <strong>check</strong>, or any TB related Pass/Fail trigger like <strong>`ERROR</strong>, <strong>UVM_ERROR</strong></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="a-c" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Checks that execute every fix interval time, e.g. Triggered by clock or time slot, etc..</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="a-t" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Automatically Triggered under such conditions that are consist of original internal hardware signals.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="block" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Disable statements with special switches .</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="mmcau" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>This is the design change in QXP, a new MMCAU is added to SECO. To avoid touching MMCAU VIP, we re-declare the specific context under our SEC VIP.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="i.MX_Security_Subsystem_QuickReference.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Resources</a><ul>
+<li><a class="reference internal" href="#fuse-load">Fuse Load</a></li>
+<li><a class="reference internal" href="#monitors">Monitors</a></li>
+<li><a class="reference internal" href="#drivers">Drivers</a></li>
+<li><a class="reference internal" href="#c-env">C ENV</a><ul>
+<li><a class="reference internal" href="#contexts-and-apis">Contexts and APIs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="i.MX_Security_Subsystem_QuickReference.html">Documentation overview</a><ul>
+  <li><a href="i.MX8QXP_Security_Subsystem_VIP_CookBook.html">i.MX8QXP_Security_Subsystem_VIP_CookBook</a><ul>
+      <li>Previous: <a href="Overview.html" title="previous chapter">Overview</a></li>
+      <li>Next: <a href="Regression.html" title="next chapter">placeholder</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Resource.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jay Zhao.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Resource.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
