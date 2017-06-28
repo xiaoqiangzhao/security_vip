@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = IMXSecuritySubsystemQuickReference
+SPHINXPROJ    = iMXQXP_Security_VIP_QuickReference
 SOURCEDIR     = .
 BUILDDIR      = _build
 

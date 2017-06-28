@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=IMXSecuritySubsystemQuickReference
+set SPHINXPROJ=iMXQXP_Security_VIP_QuickReference
 
 if "%1" == "" goto help
 

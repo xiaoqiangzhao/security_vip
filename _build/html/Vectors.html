@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Vectors &#8212; i.MXQXP_Security_VIP_QuickReference 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Patterns_Example" href="Patterns_Example.html" />
+    <link rel="prev" title="Resources" href="Resource.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Patterns_Example.html" title="Patterns_Example"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Resource.html" title="Resources"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="vectors">
+<h1>Vectors<a class="headerlink" href="#vectors" title="Permalink to this headline">¶</a></h1>
+<p>There are several vectors in security test plan, and all C source files are maintained in our VIP. We will make a brief introduction about them.</p>
+<div class="section" id="aboout-test-plan">
+<h2>Aboout Test Plan<a class="headerlink" href="#aboout-test-plan" title="Permalink to this headline">¶</a></h2>
+<p>There are two test plans for security subsystem.
+One for <strong>PA</strong> <a class="footnote-reference" href="#pa" id="id1">[1]</a></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/tool_data/razor/sanity/iMX8QX_Security_PM_Verification_Plan.xlsx
+</pre></div>
+</div>
+<p>One for normal:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/tool_data/razor/iMX8QX_SS_SECURITY_Verification_Plan.xlsx
+</pre></div>
+</div>
+<p>Basically these two test plans originate from i.MXQM and with some updates for design change. Vectors and cases listed in the plan are exactly what we are focusing on, regardless of what else we have under the server directory .</p>
+</div>
+<div class="section" id="life-cycle">
+<h2>Life Cycle<a class="headerlink" href="#life-cycle" title="Permalink to this headline">¶</a></h2>
+<p>Short description quoted from Security Subsystem ADD :
+&#8220;<em>The Chip Life Cycle applies to all cores and to both the silicon vendor (NXP) and OEM stakeholders. Secrets may be installed onto a device at different stages of the chip life cycle including from when the chip is first fused and when firmware and secure boot processes are enforced. Because of the possibility of failure, the chip may need to be returned to the OEM and/or to the silicon manufacturer. The Chip Life Cycle controls help ensure that secrets provisioned in one stage are not accessible to another as the chip progresses to the field and also as the chip returns back to the OEM and to the silicon manufacturer.</em>&#8221; See details in section 5.3.6.17 of ADD</p>
+<p>Test cases in this vector are designed to cover transitions between life cycle states and some effects like access restrictions in different life cycle states.</p>
+<p>Remember, life cycle is tightly coupled with ADM and SNVS. In fact, it&#8217;s part of ADM, so some corners are going to be covered in other vectors .</p>
+<p>Since there is no key changes for life cycle, all test cases are copied from QM, and almost no modification.</p>
+</div>
+<div class="section" id="scu-sec-caam">
+<h2>scu_sec_caam<a class="headerlink" href="#scu-sec-caam" title="Permalink to this headline">¶</a></h2>
+<p>CAAM is one of the <strong>Big 3</strong> IPs under security subsystem, another two are SNVS and ADM. From function point of view, these three IPs are coupled together tightly. You can get some necessary info from security subsystem ADD and block guide of CAAM . In general , it&#8217;s , quoted from section 5.2.2 of SEC ADD ,&#8221;<em>CAAM is to support a set of industry standard hardware accelerators, boot time acceleration of the hashing function, crypto key protection, HDCP 2.X authentication and protected video path (from software) support,manufacturing protection and public key cryptographic acceleration, and interoperate with TrustZone, Resource Domain and system virtualization access controls</em>&#8220;</p>
+<p>In A0 version of i.MXQXP, there is no significant design change of CAAM compared with i.MXQM, so few updates are needed for test cases. But since, as we say, it&#8217;s not a isolated IP and it interacts with other parts of subsystem very often , a lot of issues are revealed from this vector.</p>
+<p>From chip level verification point of view, you don&#8217;t need to get very familiar with CAAM&#8217;s inner details, well, it would be nice to have, but not necessary since we are focusing on the port connections around CAAM and are not going to check all the features itself in this vector, that should be done through standalone DV <a class="footnote-reference" href="#dv" id="id2">[2]</a>.</p>
+<p>Besides of general verification targets like register access, clock control, LPM <a class="footnote-reference" href="#lpm" id="id3">[3]</a> , etc., the key responsibility of this vector is to cover the aspect of security control.</p>
+</div>
+<div class="section" id="scu-sec-int">
+<h2>scu_sec_int<a class="headerlink" href="#scu-sec-int" title="Permalink to this headline">¶</a></h2>
+<p>This is about several exceptions from M0+ inside security subsystem. All reused from i.MXQM .</p>
+</div>
+<div class="section" id="scu-sec-m4-acc">
+<h2>scu_sec_m4_acc<a class="headerlink" href="#scu-sec-m4-acc" title="Permalink to this headline">¶</a></h2>
+<p>Access resources of security subsystem from M4 inside SCU subsystem. All C source files are updated due to memory map change and increase of IPs. Please notice do not override them with i.MXQM versions.</p>
+</div>
+<div class="section" id="scu-sec-mmcau">
+<h2>scu_sec_mmcau<a class="headerlink" href="#scu-sec-mmcau" title="Permalink to this headline">¶</a></h2>
+<p>Description about mmcau: quote, &#8220;<em>The Memory-Mapped Cryptographic Acceleration Unit (mmCAU) is a coprocessor that is connected to the processor&#8217;s private peripheral bus (PPB). It supports the hardware implementation of a set of specialized operations to improve the throughput of software-based security encryption/decryption operations and message digest functions.</em>&#8220;</p>
+<p>This is a new vector in i.MXQXP, as this mmcau is added in this project to SECO, test cases follow the vector in SCU subsystem, but since these are for different cores, some workaround are needed for specific case. This will be introduced later .</p>
+<p>Generally speaking, design changes always come with bugs, it&#8217;s no exception here. You can refer to tickets <strong>TKT314206</strong> and <strong>TKT317747</strong> for detailed info.</p>
+</div>
+<div class="section" id="scu-sec-mu-sec-mu">
+<h2>scu_sec_mu &amp; sec_mu<a class="headerlink" href="#scu-sec-mu-sec-mu" title="Permalink to this headline">¶</a></h2>
+<p>Not sure why two vectors in QM, just reused.</p>
+</div>
+<div class="section" id="scu-sec-romcp">
+<h2>scu_sec_romcp<a class="headerlink" href="#scu-sec-romcp" title="Permalink to this headline">¶</a></h2>
+<p>ROMCP is short for <em>ROM Controller with Patch</em>, this IP is used almost in every i.MX series products for ROM access and patching.You can find detailed info in RM in any i.MX chips.</p>
+<p>This vector is following i.MXQM except that the size of ROM for SECO increased to 80K from 64K, so updates are needed. Also, bug is found for this design change, you can check in designPDM for details.</p>
+</div>
+<div class="section" id="scu-sec-snvs">
+<h2>scu_sec_snvs<a class="headerlink" href="#scu-sec-snvs" title="Permalink to this headline">¶</a></h2>
+<p>Another <strong>Big 3</strong> member. SNVS plays quite an important role inside Security Architecture of i.MX series chips. Generally speaking, it&#8217;s used to detect attacks and potential threaten ,then react inside and output violations to system. You can see details in section 5.3.2 of SEC ADD and it&#8217;s block guide.</p>
+<p>An important design change is about it&#8217;s tampers. In i.MXQXP, we have 10 external tampers and 5 active tampers, while in i.MXQM it&#8217;s 4 and 2. Besides of the numbers, IOMUX also changes since we don&#8217;t have enough outer pads for tamper only, so those tampers in i.MXQXP are sharing pads with other IPs like CSU . And we need to communicate with design guys into details to cover such changes.</p>
+<p>Regardless of external/active tampers, other three analog tampers need more attention, which are for voltage/temperature/clock attack detection . The whole path should be covered, that is from the true violation detected to the reaction inside SNVS. We have learned a lesson in i.MXUL , in which project, a big issue with clock tamper is ignored and results in re-tapout of the chip.</p>
+<p>There is another IP VIP for SNVS , where some resources are maintained, you will need to look into it when meeting some problems:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/common_blocks/v_ms_snvs_vip
+</pre></div>
+</div>
+</div>
+<div class="section" id="scu-sec-wdog">
+<h2>scu_sec_wdog<a class="headerlink" href="#scu-sec-wdog" title="Permalink to this headline">¶</a></h2>
+<p>Following scu_wdog , but some <strong>low power mode</strong> relevant cases are removed. We can not be sure whether it&#8217;s a deliberate design change or just a <strong>Leave it being</strong> bug. We do have some emails talking about this, and there is no problem with Architecture guys.</p>
+</div>
+<div class="section" id="sec-adm">
+<h2>sec_adm<a class="headerlink" href="#sec-adm" title="Permalink to this headline">¶</a></h2>
+<p>To be honest, I should put this vector at the beginning ,due to its significant priority. As a member of <strong>Big 3</strong>, lots of attention is payed to ADM for three reasons:</p>
+<ul class="simple">
+<li>It&#8217;s a new IP and still in developing.</li>
+<li>It&#8217;s untested , as far as we know, there is no standalone DV ENV for ADM right now. I think it&#8217;s due to aggressive schedule.</li>
+<li>It plays a significant role in security subsystem. It&#8217;s akin to a center control unit that affects almost every aspect of security subsystem .</li>
+</ul>
+<p>Below description is quoted from section 5.2.4 in SEC ADD : &#8220;<em>The ADM is a module that works in conjunction with the debug system and fuse configuration to provide security measures. It receives control signals from various sources such as pins, OTP fuses, and the SCU, DAP, and JTAG at boot and during run time to determine, restrict and indicate use of the debugging components. Certain debugging features are allowed or disallowed based on NXP and OEM requirements</em>&#8221; .</p>
+<p>In fact, it&#8217;s not just about debug components, as I mentioned before, it also affects many aspect of security subsystem through its GPRs. Whatever, you will need to put it under high priority.</p>
+</div>
+<div class="section" id="sec-jtagc">
+<h2>sec_jtagc<a class="headerlink" href="#sec-jtagc" title="Permalink to this headline">¶</a></h2>
+<p>Covering some corners of interacts of Jtagc and ADM , copied from i.MXQM. More corners are covered by <strong>debug</strong> vector.</p>
+</div>
+<div class="section" id="sec-mscm">
+<h2>sec_mscm<a class="headerlink" href="#sec-mscm" title="Permalink to this headline">¶</a></h2>
+<p>This vector is used to cover <strong>ECC</strong> function of SECO RAM, including single bit error and multi bits error. Both these two types of ECC errors are generated using driver ram_ecc_corrupt.</p>
+</div>
+<div class="section" id="sec-ocotp">
+<h2>sec_ocotp<a class="headerlink" href="#sec-ocotp" title="Permalink to this headline">¶</a></h2>
+<p>Covering basic OCOTP program function and CRC test. For usage of all fuses, they are distributed in different vectors under security subsystem.
+Please notice there is one case that is still not passing: <strong>ocotp_ctrl_ded_irq_16k</strong> , but this is already covered by IP standalone DV and should be ok.</p>
+</div>
+<div class="section" id="sec-seco-access">
+<h2>sec_seco_access<a class="headerlink" href="#sec-seco-access" title="Permalink to this headline">¶</a></h2>
+<p>Only one case exists. It&#8217;s used to check those reserved address spaces from SECO point of view. Should be updated due to address space change in i.MXQXP.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="pa" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Power Aware, CPF involved .</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="dv" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Short for design verification .</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="lpm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Low Power Mode .</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="i.MXQXP_Security_VIP_QuickReference.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Vectors</a><ul>
+<li><a class="reference internal" href="#aboout-test-plan">Aboout Test Plan</a></li>
+<li><a class="reference internal" href="#life-cycle">Life Cycle</a></li>
+<li><a class="reference internal" href="#scu-sec-caam">scu_sec_caam</a></li>
+<li><a class="reference internal" href="#scu-sec-int">scu_sec_int</a></li>
+<li><a class="reference internal" href="#scu-sec-m4-acc">scu_sec_m4_acc</a></li>
+<li><a class="reference internal" href="#scu-sec-mmcau">scu_sec_mmcau</a></li>
+<li><a class="reference internal" href="#scu-sec-mu-sec-mu">scu_sec_mu &amp; sec_mu</a></li>
+<li><a class="reference internal" href="#scu-sec-romcp">scu_sec_romcp</a></li>
+<li><a class="reference internal" href="#scu-sec-snvs">scu_sec_snvs</a></li>
+<li><a class="reference internal" href="#scu-sec-wdog">scu_sec_wdog</a></li>
+<li><a class="reference internal" href="#sec-adm">sec_adm</a></li>
+<li><a class="reference internal" href="#sec-jtagc">sec_jtagc</a></li>
+<li><a class="reference internal" href="#sec-mscm">sec_mscm</a></li>
+<li><a class="reference internal" href="#sec-ocotp">sec_ocotp</a></li>
+<li><a class="reference internal" href="#sec-seco-access">sec_seco_access</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Resource.html"
+                        title="previous chapter">Resources</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Patterns_Example.html"
+                        title="next chapter">Patterns_Example</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Vectors.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Patterns_Example.html" title="Patterns_Example"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Resource.html" title="Resources"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jay Zhao.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

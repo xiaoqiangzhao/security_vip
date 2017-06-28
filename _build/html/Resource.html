@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Resources &#8212; I.MX Security Subsystem QuickReference 1.0 documentation</title>
+    <title>Resources &#8212; i.MXQXP_Security_VIP_QuickReference 1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,20 +24,27 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="placeholder" href="Regression.html" />
-    <link rel="prev" title="Overview" href="Overview.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="next" title="Vectors" href="Vectors.html" />
+    <link rel="prev" title="Overview" href="Overview.html" /> 
   </head>
   <body role="document">
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Vectors.html" title="Vectors"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -216,7 +223,7 @@ only 4 external tamper and 2 active tamper exist.</td>
 <td>Procedure-Block</td>
 <td>Drive inner logic of ADM . This driver is the most important one in
 security VIP since several Vectors and many test cases are involved
-and lots of force assignments are used inside . Need special care</td>
+and lots of force assignments are used inside . <strong>Need special care</strong></td>
 </tr>
 <tr class="row-odd"><td>ram_ecc_corrupt</td>
 <td>NULL</td>
@@ -236,7 +243,7 @@ cm0p_sleeping,etc..  Not Recommended in my personal opinion</td>
 <td>SNVS VIP</td>
 <td>SEC VIP</td>
 <td>Module-Instance</td>
-<td>SNVS msic control</td>
+<td>SNVS msic control , you need to take a look into this for details</td>
 </tr>
 </tbody>
 </table>
@@ -249,7 +256,7 @@ As we know, out TB consists of <strong>C</strong> and <strong>Verilog</strong>, 
 The so called C ENV provided by our VIP can be divided into two parts.</p>
 <ol class="arabic simple">
 <li>Contexts and APIs</li>
-<li>Memory definition</li>
+<li>Memory Map definition</li>
 </ol>
 <div class="section" id="contexts-and-apis">
 <h3>Contexts and APIs<a class="headerlink" href="#contexts-and-apis" title="Permalink to this headline">¶</a></h3>
@@ -265,8 +272,8 @@ The so called C ENV provided by our VIP can be divided into two parts.</p>
 <li>ROMCP under <strong>SCU</strong> subsystem, it&#8217;s for <strong>SCU_CM4</strong></li>
 <li>ROMCP under <strong>Security</strong> subsystem, it&#8217;s for our <strong>SECO</strong> and this is the one we need to care.</li>
 </ul>
-<p>The context for ROMCP is declared under ROMCP VIP:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/common_blocks/v_ms_imx_romcp_vip/tool_data/compiler/include/romcp.h
+<p>The context for ROMCP is declared under ROMCP VIP</p>
+<div class="code c highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/common_blocks/v_ms_imx_romcp_vip/tool_data/compiler/include/romcp.h
 
 typedef struct
 { char*          NAME;
@@ -284,72 +291,7 @@ typedef struct
 </pre></div>
 </div>
 <p>Then, we just create the creation API under our SEC VIP</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/ss_sec_romcp_context.h
-
-void ss_sec_create_context_romcp0(ROMCP_CONTEXT** context){
-   static ROMCP_CONTEXT static_context;
-   static_context.NAME                    = &quot;SEC_ROMCP&quot;;
-   #ifndef SECO_ACCESS
-   static_context.REGS_BASE               =  SEC_ROMCP_BASE; //NEED TO CHANGE THE NAME TO ROMCP(IT IS FLEXBUS NOW in sec_base_address file)
-   #else
-   static_context.REGS_BASE               =  SECO_ROMCP_BASE;
-   #endif
-   static_context.ips_err_int_cnt           = 0;
-   static_context.ROMCP_REG_ADDR_OFFSET_LST = (uint32_t*)&amp;sec_romcp_reg_addr_offset_lst[0];
-   static_context.ROMCP_REG_RST_LST         = (uint32_t*)&amp;sec_romcp_reg_rst_lst[0];
-   static_context.ROMCP_REG_BIT_MASK_LST    = (uint32_t*)&amp;sec_romcp_reg_bit_mask_lst[0];
-   static_context.ROMCP_REG_RW_BIT_MASK_LST = (uint32_t*)&amp;sec_romcp_reg_rw_bit_mask_lst[0];
-   //static_context.TRIG_BASE             = SCU_ROMCP_TRIG_BASE; //FUTURE USAGE
-   //static_context.MBOX_BASE             = SCU_ROMCP_MBOX_BASE; //FUTURE USAGE
-   static_context.ROMCP_IPS_ERROR_VECTOR  = HARD_FAULT_XCP;
-   *context=&amp;static_context;
- }
-</pre></div>
-</div>
-<p>Last step, we modify the top_level file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/tool_data/compiler/include/context_romcp.h
-
-void romcp_populate_request(ip_request_t* ip_request){
-   #ifdef ROMCP_ID
-     ip_request-&gt;context_id            = ROMCP_ID;
-   #endif
-     ip_request-&gt;context_array_length  = NUM_ROMCP_IN_SYSTEM;
-     ip_request-&gt;init_context          = romcp_init_context;
-   }
-
-void romcp_init_context(ip_request_t* ip_request){
-  switch (ip_request-&gt;context_id){
-    case (LSIO_ROMCP_0):   INFO(&quot;romcp_init_context&quot;,&quot;Initialize LSIO ROMCP context&quot;);
-                        ss_lsio_create_context_romcp0((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
-                        //b48029 - Define added temporarily to avoid errors when the Security controller
-                        //Core M0 parse these lines , seco_ip_request needs to add this filed to ip_request strunct
-                        #ifndef SECO_ACCESS
-                        ip_request-&gt;clock_config   = DSC_ENABLE_LSIO_DSC;
-                        #endif
-            INFO(&quot;STIM&quot;, &quot;Initialize LSIO DSC&quot;);
-                        INFO(&quot;STIM&quot;, &quot;Initialize LSIO ROMCP clock&quot;);
-
-                        break;
-    case (SCU_ROMCP):   INFO(&quot;romcp_init_context&quot;,&quot;Initialize SCU ROMCP context&quot;);
-                        ss_scu_romcp_context((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
-                        #ifndef SECO_ACCESS
-                        DSC_INIT_SCU_SYS();
-                        #endif
-                        break;
-
-     case(SEC_ROMCP_0): INFO(&quot;romcp_init_context&quot;,&quot;Initialize LSIO ROMCP context&quot;);
-                        ss_sec_create_context_romcp0((ROMCP_CONTEXT**)(&amp;ip_request-&gt;context_ptr));
-                        //ip_request-&gt;clock_config   = DSC_ENABLE_LSIO_DSC;slice ?
-            INFO(&quot;STIM&quot;, &quot;Initialize SEC DSC&quot;);
-                        INFO(&quot;STIM&quot;, &quot;Initialize SEC ROMCP clock&quot;);
-
-                        break;
-    default:            ERROR(&quot;populate_romcp&quot;,&quot;trying to populated an unsupported ROMCP&quot;);
-                        break;
-  }
-}
-</pre></div>
-</div>
+<p>Last step, we modify the top_level file</p>
 <p>Finally, all set done. Just to reminder, if you are building a new context, remember to add necessary information in <strong>context_api.h</strong> and <strong>ip_request.h</strong>, just like how we do with <strong>MMCAU</strong> <a class="footnote-reference" href="#mmcau" id="id5">[5]</a> for SECO, which is added in i.MXQXP .</p>
 <p>To specify which ROMCP is involved in your test case , just assign correct ID to the IP in your arg file like below</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SCU_C_ARG</span> <span class="o">+=</span> <span class="n">ROMCP_ID</span><span class="o">=</span><span class="n">SEC_ROMCP_0</span>
@@ -357,6 +299,27 @@ void romcp_init_context(ip_request_t* ip_request){
 </div>
 <p>Based on the context, some APIs are created for some specific tasks, and it would be very convenient for reuse if the same type IP are integrated with more than one instances .
 For any function used in the test cases, you&#8217;d better look into our SEC VIP or IP VIP for detailed information. Personally ,I recommend using <a class="reference external" href="http://cscope.sourceforge.net/">CSCOPE</a> to aid you for quick lookup.</p>
+</div>
+<div class="section" id="memory-map">
+<h3>Memory Map<a class="headerlink" href="#memory-map" title="Permalink to this headline">¶</a></h3>
+<p>Memory map files locate at</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/sray/mem_map
+</pre></div>
+</div>
+<p>They are declared in Verilog Style, but will be translated by scripts to both V and C styles and merged with other VIPs to top level .</p>
+<p>C:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/tool_data/compiler/include/c_mem_map.h
+</pre></div>
+</div>
+<p>V:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/testbench/top_defines_v/mem_map.v
+</pre></div>
+</div>
+<p>So any modifications to these mem map files, you will need to remove those temp header files. Recommend using script:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/clean_soc
+</pre></div>
+</div>
+<p>For some memory address macro that you can not find, you may need to a look at the VIP of relevant IP.</p>
 <p class="rubric">Footnotes</p>
 <table class="docutils footnote" frame="void" id="checker" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -398,7 +361,7 @@ For any function used in the test cases, you&#8217;d better look into our SEC VI
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="i.MX_Security_Subsystem_QuickReference.html">Table Of Contents</a></h3>
+  <h3><a href="i.MXQXP_Security_VIP_QuickReference.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Resources</a><ul>
 <li><a class="reference internal" href="#fuse-load">Fuse Load</a></li>
@@ -406,22 +369,19 @@ For any function used in the test cases, you&#8217;d better look into our SEC VI
 <li><a class="reference internal" href="#drivers">Drivers</a></li>
 <li><a class="reference internal" href="#c-env">C ENV</a><ul>
 <li><a class="reference internal" href="#contexts-and-apis">Contexts and APIs</a></li>
+<li><a class="reference internal" href="#memory-map">Memory Map</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="i.MX_Security_Subsystem_QuickReference.html">Documentation overview</a><ul>
-  <li><a href="i.MX8QXP_Security_Subsystem_VIP_CookBook.html">i.MX8QXP_Security_Subsystem_VIP_CookBook</a><ul>
-      <li>Previous: <a href="Overview.html" title="previous chapter">Overview</a></li>
-      <li>Next: <a href="Regression.html" title="next chapter">placeholder</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Vectors.html"
+                        title="next chapter">Vectors</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -443,20 +403,24 @@ For any function used in the test cases, you&#8217;d better look into our SEC VI
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Jay Zhao.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/Resource.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Vectors.html" title="Vectors"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Overview.html" title="Overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jay Zhao.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
   </body>
 </html>

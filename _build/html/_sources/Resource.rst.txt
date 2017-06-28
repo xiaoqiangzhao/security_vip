@@ -107,6 +107,8 @@ A simple flow may be:
 #. **Receive mailbox or trigger in monitor and execute checker.**
 
 
+
+
 Drivers
 -------
 There are two kinds of drivers in security vip. 
@@ -116,30 +118,30 @@ There are two kinds of drivers in security vip.
 
 See summary below.
 
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| Drivers              | Module DIR | Instance DIR | Type            | Description                                                          |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| snvs_onoff_drv_qmax  | SEC VIP    | SEC VIP      | Module-Instance | Drive **OnOFF** pad, mostly based on mailbox and trigger             |
-|                      |            |              |                 | Please notice, there is an internal initial-block used to            |
-|                      |            |              |                 | accelerate 32k clk.                                                  |
-|                      |            |              |                 | Add **SNVS_LP_SPEED_32kHZ_CLK** to **sim_arg** to enable this        |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| snvs_tamper_drv_qmax | SEC VIP    | SEC VIP      | Module-Instance | Drive **SNVS TAMPER** pads. We have 10 external tamper and five      |
-|                      |            |              |                 | of which can be used as active tamper. It differs with QM where      |
-|                      |            |              |                 | only 4 external tamper and 2 active tamper exist.                    |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| adm_gpr_test_drivers | NULL       | SEC VIP      | Procedure-Block | Drive inner logic of ADM . This driver is the most important one in  |
-|                      |            |              |                 | security VIP since several Vectors and many test cases are involved  |
-|                      |            |              |                 | and lots of force assignments are used inside . Need special care    |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| ram_ecc_corrupt      | NULL       | SEC VIP      | Procedure-Block | Specific driver to generate signal-bit and multi-bits ECC error      |
-|                      |            |              |                 | in SECO RAM.                                                         |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| sec_wdg_drv          | NULL       | SEC VIP      | Procedure-Block | Specific driver to some internal wdog signals.E.g. ipg_clk, wdg_rsto |
-|                      |            |              |                 | cm0p_sleeping,etc..  Not Recommended in my personal opinion          |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
-| snvs_msic            | SNVS VIP   | SEC VIP      | Module-Instance | SNVS msic control                                                    |
-+----------------------+------------+--------------+-----------------+----------------------------------------------------------------------+
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| Drivers              | Module DIR | Instance DIR | Type            | Description                                                           |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| snvs_onoff_drv_qmax  | SEC VIP    | SEC VIP      | Module-Instance | Drive **OnOFF** pad, mostly based on mailbox and trigger              |
+|                      |            |              |                 | Please notice, there is an internal initial-block used to             |
+|                      |            |              |                 | accelerate 32k clk.                                                   |
+|                      |            |              |                 | Add **SNVS_LP_SPEED_32kHZ_CLK** to **sim_arg** to enable this         |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| snvs_tamper_drv_qmax | SEC VIP    | SEC VIP      | Module-Instance | Drive **SNVS TAMPER** pads. We have 10 external tamper and five       |
+|                      |            |              |                 | of which can be used as active tamper. It differs with QM where       |
+|                      |            |              |                 | only 4 external tamper and 2 active tamper exist.                     |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| adm_gpr_test_drivers | NULL       | SEC VIP      | Procedure-Block | Drive inner logic of ADM . This driver is the most important one in   |
+|                      |            |              |                 | security VIP since several Vectors and many test cases are involved   |
+|                      |            |              |                 | and lots of force assignments are used inside . **Need special care** |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| ram_ecc_corrupt      | NULL       | SEC VIP      | Procedure-Block | Specific driver to generate signal-bit and multi-bits ECC error       |
+|                      |            |              |                 | in SECO RAM.                                                          |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| sec_wdg_drv          | NULL       | SEC VIP      | Procedure-Block | Specific driver to some internal wdog signals.E.g. ipg_clk, wdg_rsto  |
+|                      |            |              |                 | cm0p_sleeping,etc..  Not Recommended in my personal opinion           |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
+| snvs_msic            | SNVS VIP   | SEC VIP      | Module-Instance | SNVS msic control , you need to take a look into this for details     |
++----------------------+------------+--------------+-----------------+-----------------------------------------------------------------------+
 
 For any **force assignment** insides the drivers, we need to make sure it won't affect other vectors. Usually we have **MailBox**, **Trigger**,  **Macro**, or **sim_arg** to block [#block]_ those assignments . As with those that are not blocked, rigorous review is needed to avoid side-effect.
 
@@ -150,7 +152,7 @@ As we know, out TB consists of **C** and **Verilog**, it's quite a typical style
 The so called C ENV provided by our VIP can be divided into two parts.
 
 #. Contexts and APIs 
-#. Memory definition 
+#. Memory Map definition 
 
 Contexts and APIs   
 ~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +170,9 @@ In our chip, we have three ROMCP:
 + ROMCP under **SCU** subsystem, it's for **SCU_CM4**
 + ROMCP under **Security** subsystem, it's for our **SECO** and this is the one we need to care.
 
-The context for ROMCP is declared under ROMCP VIP::
+The context for ROMCP is declared under ROMCP VIP
+
+.. code:: c
    
    $DESIGN_DIR/testbench/common_blocks/v_ms_imx_romcp_vip/tool_data/compiler/include/romcp.h 
    
@@ -186,8 +190,9 @@ The context for ROMCP is declared under ROMCP VIP::
      uint32_t*      ROMCP_REG_RW_BIT_MASK_LST;
    } ROMCP_CONTEXT;
 
-Then, we just create the creation API under our SEC VIP ::
+Then, we just create the creation API under our SEC VIP
    
+.. code:: c
    $DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/ss_sec_romcp_context.h 
    
    void ss_sec_create_context_romcp0(ROMCP_CONTEXT** context){
@@ -209,8 +214,9 @@ Then, we just create the creation API under our SEC VIP ::
       *context=&static_context;
     }
 
-Last step, we modify the top_level file::
+Last step, we modify the top_level file
    
+.. code:: c
    $DESIGN_DIR/testbench/blocks/soc_tb/tool_data/compiler/include/context_romcp.h
    
    void romcp_populate_request(ip_request_t* ip_request){
@@ -262,9 +268,28 @@ To specify which ROMCP is involved in your test case , just assign correct ID to
 Based on the context, some APIs are created for some specific tasks, and it would be very convenient for reuse if the same type IP are integrated with more than one instances .
 For any function used in the test cases, you'd better look into our SEC VIP or IP VIP for detailed information. Personally ,I recommend using `CSCOPE`_ to aid you for quick lookup.
 
+Memory Map
+~~~~~~~~~~
 
+Memory map files locate at ::
+   
+   $DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/sray/mem_map
 
+They are declared in Verilog Style, but will be translated by scripts to both V and C styles and merged with other VIPs to top level .
 
+C::
+   
+   $DESIGN_DIR/testbench/blocks/soc_tb/tool_data/compiler/include/c_mem_map.h
+
+V::
+   
+   $DESIGN_DIR/testbench/blocks/soc_tb/testbench/top_defines_v/mem_map.v
+
+So any modifications to these mem map files, you will need to remove those temp header files. Recommend using script::
+   
+   $DESIGN_DIR/testbench/blocks/soc_tb/clean_soc
+
+For some memory address macro that you can not find, you may need to a look at the VIP of relevant IP.
 
 .. _CSCOPE: http://cscope.sourceforge.net/
 .. rubric:: Footnotes

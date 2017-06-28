@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Patterns_Example &#8212; i.MXQXP_Security_VIP_QuickReference 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AfterWords" href="AfterWords.html" />
+    <link rel="prev" title="Vectors" href="Vectors.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="AfterWords.html" title="AfterWords"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Vectors.html" title="Vectors"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="patterns-example">
+<h1>Patterns_Example<a class="headerlink" href="#patterns-example" title="Permalink to this headline">¶</a></h1>
+<p>We are going to take some examples to illustrate how they work.</p>
+<div class="section" id="scu-snvs-tamper-active3-fail">
+<h2>scu_snvs_tamper_active3_fail<a class="headerlink" href="#scu-snvs-tamper-active3-fail" title="Permalink to this headline">¶</a></h2>
+<p>This pattern locates at vector <strong>scu_sec_snvs</strong>. It&#8217;s a new pattern deriving from scu_snvs_tamper_active1_fail since we have 5 active tamper instead of 2 now.</p>
+<p>Take a look at the arg file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/vectors/scu_sec_snvs/ stimulus/arg/scu_snvs_tamper_active3_fail.arg
+
+SCU_STIM   = snvs_tamper_active_fail
+SCU_C_ARG += SNVS_ID=SNVS0
+
+SCU_C_ARG += SKIP_DB_CONFIG=1
+
+sim_arg        := +SIMULATION_TIMEOUT=3000000 $(sim_arg)
+sim_arg        := +SNVS_ACTIVE_TAMPER_ENABLE=1 $(sim_arg)
+
+SCU_C_ARG += ACT3_TAMPER=1
+SCU_C_ARG += EXT5_TAMPER=1
+sim_arg   := +SNVS_EXTERNAL_TAMPER_ENABLE=1 $(sim_arg)
+sim_arg        := +SNVS_LP_SPEED_32KHZ_CLK $(sim_arg)
+</pre></div>
+</div>
+<p>For all these active tamper patterns, we are using the same c file with different SCU_C_ARG to indicate which tampers are used.</p>
+<p>For another three sim_args , you can find their function in driver snvs_tamper_drv_qmax.</p>
+<p>Regarding the design changes, we will need to expand the driver to support 10 external tampers and 5 active tampers. Also, since we are using Trigger and MailBox to communicate between C and V, we also need to expand C source file</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/imx_subsys_vip/v_sc_imx_security_vip/tool_data/compiler/include/snvs_util.h
+</pre></div>
+</div>
+<p>Ok, almost done. Consult with design team, we know that a register bit is added to switch the shared pads to tamper mode , so we need to configure that at appropriate location in our C file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">enable</span> <span class="n">tamper_en_1p8v</span>
+<span class="n">BSET32</span><span class="p">(</span><span class="n">SNVS_LP_TRIM_TEST</span><span class="p">,</span> <span class="n">BIT29</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For these active tamper patterns , we encountered a small issue with tamper pad model. You may meet such an error info</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>SNVS_PADS_ERROR @ 2236957.446000 ns --: [testbench.top.ss_scu.snvs_lp_top_qx.snvs_pads_drivers.tamper_out_04] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!
+SNVS_PADS_ERROR @ 2236957.446000 ns --: [testbench.top.ss_scu.snvs_lp_top_qx.snvs_pads_drivers.tamper_out_03] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!
+SNVS_PADS_ERROR @ 2236957.446000 ns --: [testbench.top.ss_scu.snvs_lp_top_qx.snvs_pads_drivers.tamper_out_02] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!
+SNVS_PADS_ERROR @ 2236957.446000 ns --: [testbench.top.ss_scu.snvs_lp_top_qx.snvs_pads_drivers.tamper_out_01] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!
+SNVS_PADS_ERROR @ 2236957.446000 ns --: [testbench.top.ss_scu.snvs_lp_top_qx.snvs_pads_drivers.tamper_out_00] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!
+</pre></div>
+</div>
+<p>These actually is not a true issue , confirmed with design team. Bus such error info will result in failure when collected by Regression, even may print a big PASS at the end. So we request the design team to add a switch to disable such error reporter.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>`ifndef DISABLE_TAMPER_PULL_CHECK
+    if ((TAMPER_EN_1P8 === 0) &amp;&amp; (PAD===1&#39;bz) &amp;&amp; (PUN===1&#39;b1) &amp;&amp; (PDN===1&#39;b1))
+       `SNVS_PADS_ERROR($sformatf(&quot;SNVS_PADS_ERROR @ %0t: [%m] Tamper disable &amp;&amp; pad floating &amp;&amp; none pull is not allowed!!!&quot;, $realtime));
+`endif
+</pre></div>
+</div>
+<p>You can try add this <em>DISABLE_TAMPER_PULL_CHECK</em> to comp_arg to disable this error reporter. Here exists an typo in version 1.2 of block.arg of our SEC VIP resulting that it&#8217;s still not disabled. You can re-add it if needed.</p>
+</div>
+<div class="section" id="seco-mmcau-cmd">
+<h2>seco_mmcau_cmd<a class="headerlink" href="#seco-mmcau-cmd" title="Permalink to this headline">¶</a></h2>
+<p>This pattern is picked up as an example for two reasons.</p>
+<ul class="simple">
+<li>MMCAU is newly added to SECO</li>
+<li>Some extra work is needed to get it work for SECO.</li>
+</ul>
+<p>Well, let&#8217;s get to the point directly. This pattern originally derives from the one under vector scu_mmcau, but that is for CM4 alike core, and what we have under security subsystem is a M0+ core. The key difference is that we don&#8217;t have a FPU in M0+ core . As the result, M0+ fails to execute those float point operations existing in our pattern. To make it work, we need to use SW lib instead of FPU hardware decoding. Fortunately I find the appropriate gcc lib for ARMv6-M core in i.MX6UL database and add it to our link process</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$DESIGN_DIR/testbench/blocks/soc_tb/vectors/scu_sec_mmcau/stimulus/makefile.defs
+
+LDFLAGS       = -L /proj/imx6ul/arm_compiler/arm-2013.05-23/lib/gcc/arm-none-eabi/4.7.3/armv6-m -lgcc
+</pre></div>
+</div>
+<p>Here we can create a makefile.defs under the stimulus directory to bypass the one provided by the TB <a class="footnote-reference" href="#tb-make" id="id1">[1]</a> . Also we create another link script to allocate memory for sections induced by added gcc lib . Then the pattern is working.</p>
+<p>Our top TB set some entries for user-define makefiles. For details, please take some time and read the makefiles in our TB .</p>
+</div>
+<div class="section" id="seco-adm-glitch-det">
+<h2>seco_adm_glitch_det<a class="headerlink" href="#seco-adm-glitch-det" title="Permalink to this headline">¶</a></h2>
+<p>This pattern is quite unique due to its special design method . It&#8217;s designed to check the clock glitch detector inside ADM. To work correctly , it fully depends on the precise delay value between two signals . But during RTL stage they directly connect these two signals and rely on the BackEnd to insert delay cells .
+So we must take different strategies to check this in both RTL and GLS views.</p>
+<p>For RTL view, there are two things we need to complete through BackDoor .</p>
+<ul class="simple">
+<li>Set appropriate delay and override the driven relationship between those two signals.</li>
+<li>Insert glitch on the ADM clock</li>
+</ul>
+<p>For GLS view, we only need to insert the glitch at appropriate time point. GLS simulation for this pattern is absolutely necessary
+These are all done in driver <em>adm_gpr_test_drivers</em>.</p>
+<p>Then to check the result, firstly we set assertion in the driver, and on the other hand, we check the FrontDoor IRQ flow.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="tb-make" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>They are under $DESIGN_DIR/testbench/blocks/imx8_common_tb/testbench</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="i.MXQXP_Security_VIP_QuickReference.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Patterns_Example</a><ul>
+<li><a class="reference internal" href="#scu-snvs-tamper-active3-fail">scu_snvs_tamper_active3_fail</a></li>
+<li><a class="reference internal" href="#seco-mmcau-cmd">seco_mmcau_cmd</a></li>
+<li><a class="reference internal" href="#seco-adm-glitch-det">seco_adm_glitch_det</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Vectors.html"
+                        title="previous chapter">Vectors</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="AfterWords.html"
+                        title="next chapter">AfterWords</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Patterns_Example.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="AfterWords.html" title="AfterWords"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Vectors.html" title="Vectors"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="i.MXQXP_Security_VIP_QuickReference.html">i.MXQXP_Security_VIP_QuickReference 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jay Zhao.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

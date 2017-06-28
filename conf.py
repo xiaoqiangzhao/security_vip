@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# I.MX Security Subsystem QuickReference documentation build configuration file, created by
-# sphinx-quickstart on Thu Jun  1 12:14:16 2017.
+# i.MXQXP_Security_VIP_QuickReference documentation build configuration file, created by
+# sphinx-quickstart on Mon Jun 26 07:59:27 2017.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -31,15 +31,7 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.todo',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
-    ]
-
-
-pdf_documents = [('i.MX8QXP_Security_Subsystem_VIP_CookBook', 'i.MX8QXP_Security_Subsystem_VIP_CookBook','i.MX8QXP_Security_Subsystem_VIP_CookBook','Jay Zhao'),]
+extensions = ['sphinx.ext.githubpages']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -51,10 +43,10 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The master toctree document.
-master_doc = 'i.MX_Security_Subsystem_QuickReference'
+master_doc = 'i.MXQXP_Security_VIP_QuickReference'
 
 # General information about the project.
-project = 'I.MX Security Subsystem QuickReference'
+project = 'i.MXQXP_Security_VIP_QuickReference'
 copyright = '2017, Jay Zhao'
 author = 'Jay Zhao'
 
@@ -83,7 +75,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
+todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -91,7 +83,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -104,13 +96,11 @@ html_theme = 'alabaster'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# min_infix_len = 3
-# max_substring_len = 12
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'IMXSecuritySubsystemQuickReferencedoc'
+htmlhelp_basename = 'iMXQXP_Security_VIP_QuickReferencedoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -137,7 +127,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'IMXSecuritySubsystemQuickReference.tex', 'I.MX Security Subsystem QuickReference Documentation',
+    (master_doc, 'iMXQXP_Security_VIP_QuickReference.tex', 'i.MXQXP\\_Security\\_VIP\\_QuickReference Documentation',
      'Jay Zhao', 'manual'),
 ]
 
@@ -147,7 +137,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'imxsecuritysubsystemquickreference', 'I.MX Security Subsystem QuickReference Documentation',
+    (master_doc, 'imxqxp_security_vip_quickreference', 'i.MXQXP_Security_VIP_QuickReference Documentation',
      [author], 1)
 ]
 
@@ -158,8 +148,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'IMXSecuritySubsystemQuickReference', 'I.MX Security Subsystem QuickReference Documentation',
-     author, 'IMXSecuritySubsystemQuickReference', 'One line description of project.',
+    (master_doc, 'iMXQXP_Security_VIP_QuickReference', 'i.MXQXP_Security_VIP_QuickReference Documentation',
+     author, 'iMXQXP_Security_VIP_QuickReference', 'One line description of project.',
      'Miscellaneous'),
 ]
 
